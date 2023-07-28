@@ -1,2 +1,4 @@
 /target
 /saves
+*.gv
+*.gv.pdf
