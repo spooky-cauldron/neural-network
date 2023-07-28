@@ -1,3 +1,5 @@
+use std::fs;
+
 #[derive(Debug)]
 struct Value {
     pub value: f32,
@@ -11,10 +13,27 @@ impl Value {
     fn new(value: f32) -> Self {
         Value { value, grad: 0.0, op: Op::None , child_0_id: None, child_1_id: None}
     }
+
+    pub fn to_save(&self) -> String {
+        let child_ids = [self.child_0_id, self.child_1_id];
+        let child_save_ids: Vec<String> = child_ids.iter()
+            .map(|child_id| match child_id {
+                Some(id) => id.to_string(),
+                None => "N".to_owned(),
+            })
+            .collect();
+
+        format!("{},{},{},{}", 
+            self.value.to_string(),
+            self.op as u8,
+            child_save_ids[0],
+            child_save_ids[1],
+        ) 
+    }
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum Op {
     None,
     Add,
@@ -43,6 +62,17 @@ impl ValueDb {
 
     pub fn get(&self, id: ID) -> &Value {
         &self.values[id]
+    }
+
+    pub fn save(&self, path: &str) {
+        let data: Vec<String> = self.values.iter()
+            .map(|value| value.to_save())
+            .collect();
+        let data_output = data.join(",");
+        match fs::write(path, data_output) {
+            Ok(_) => println!("Saved model to path: {}", path),
+            Err(err) => println!("Error saving: {}", err),
+        }
     }
 }
 
@@ -89,5 +119,7 @@ fn main() {
     println!("{:?}", db.get(e));
 
     db.zero_grad();
+
+    db.save("./saves/model_0.txt")
 }
 
