@@ -23,8 +23,9 @@ impl Value {
             })
             .collect();
 
-        format!("{},{},{},{}", 
+        format!("{},{},{},{},{}", 
             self.value.to_string(),
+            self.grad.to_string(),
             self.op as u8,
             child_save_ids[0],
             child_save_ids[1],

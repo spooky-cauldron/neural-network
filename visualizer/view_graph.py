@@ -13,6 +13,7 @@ class Op(Enum):
 @dataclass
 class Value:
     value: float
+    grad: float
     op: Op
     child_0_id: str
     child_1_id: str
@@ -36,7 +37,7 @@ def create_graph(model: List[Value]) -> Digraph:
     dot = Digraph('model')
 
     for i, value in enumerate(model):
-        dot.node(str(i), label=value.value)
+        dot.node(str(i), label=f'{value.value} - {value.grad}')
         op_node = None
         if value.op == Op.ADD.value:
             op_node = f'+{i}'
@@ -55,7 +56,6 @@ def create_graph(model: List[Value]) -> Digraph:
                 else:
                     dot.edge(child_id, str(i))
     return dot
-
 
 
 def main():
