@@ -24,7 +24,7 @@ def load_model(path: str) -> List[Value]:
         data = f.read()
     data = data.split(',')
 
-    n_value_fields = 4
+    n_value_fields = 5
     values = []
     for i in range(0, len(data), n_value_fields):
         value_data = data[i:i + n_value_fields]
