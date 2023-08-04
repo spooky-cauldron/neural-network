@@ -185,7 +185,7 @@ fn test_value_db_backpropagation_tanh() {
 }
 
 #[test]
-fn test_value_db_backpropagation_duplicate() {
+fn test_value_db_backpropagation_gradient_accumulation() {
     let mut db = ValueDb::new();
 
     let a = db.push(3.0);
@@ -207,7 +207,7 @@ fn test_value_db_backpropagation_duplicate() {
 }
 
 #[test]
-fn test_value_db_backpropagation_duplicate_2() {
+fn test_value_db_backpropagation_gradient_accumulation_2() {
     let mut db = ValueDb::new();
 
     let a = db.push(-2.0);
