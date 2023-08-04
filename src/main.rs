@@ -1,18 +1,14 @@
-use neural_network::value_db::ValueDb;
+use neural_network::neural_net::NeuralNetwork;
 
 
 fn main() {
-    let mut db = ValueDb::new();
+    let mut nn = NeuralNetwork::new();
+    let inputs = [2.0, -3.0, 8.0];
+    nn.set_input_layer(&inputs);
+    nn.add_layer(3, 4);
+    nn.add_layer(4, 4);
+    nn.add_layer(4, 1);
 
-    let a = db.push(-2.0);
-    let b = db.push(3.0);
-    let d = db.op_mul(a, b);
-    let e = db.op_add(a, b);
-    let f = db.op_mul(d, e);
-
-    db.zero_grad();
-    db.backward(f);
-
-    db.save("./saves/model_0.txt")
+    nn.save("./saves/model_0.txt");
 }
 
