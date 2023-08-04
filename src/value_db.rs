@@ -30,6 +30,12 @@ impl ValueDb {
         &mut self.values[id]
     }
 
+    pub fn zero_grad(&mut self) {
+        for value in self.values.iter_mut() {
+            value.grad = 0.0;
+        }
+    }
+
     pub fn backward(&mut self, from: ID) {
         self.get_mut(from).grad = 1.0;
         let mut child_gradients_to_calculate = VecDeque::new();
@@ -52,15 +58,20 @@ impl ValueDb {
 
         match parent_op {
             Op::Add => {
-                self.get_mut(children[0]).grad = parent_grad;
-                self.get_mut(children[1]).grad = parent_grad;
+                self.get_mut(children[0]).grad += parent_grad;
+                self.get_mut(children[1]).grad += parent_grad;
             }
 
             Op::Multiply => {
                 let child_1_value = self.get(children[1]).value;
-                self.get_mut(children[0]).grad = child_1_value * parent_grad;
+                self.get_mut(children[0]).grad += child_1_value * parent_grad;
                 let child_0_value = self.get(children[0]).value;
-                self.get_mut(children[1]).grad = child_0_value * parent_grad;
+                self.get_mut(children[1]).grad += child_0_value * parent_grad;
+            }
+
+            Op::Tanh => {
+                let child_0_value = self.get(children[0]).value;
+                self.get_mut(children[0]).grad += (1.0 - child_0_value.tanh().powi(2)) * parent_grad;
             }
 
             _ => ()
@@ -81,8 +92,8 @@ impl ValueDb {
 
 impl ValueDb {
     pub fn op_add(&mut self, a: ID, b: ID) -> ID {
-        let a_value = self.values[a].value;
-        let b_value = self.values[b].value;
+        let a_value = self.get(a).value;
+        let b_value = self.get(b).value;
         let result = self.push(a_value + b_value);
 
         self.join(Op::Add, result, (Some(a), Some(b)));
@@ -91,8 +102,8 @@ impl ValueDb {
     }
 
     pub fn op_mul(&mut self, a: ID, b: ID) -> ID {
-        let a_value = self.values[a].value;
-        let b_value = self.values[b].value;
+        let a_value = self.get(a).value;
+        let b_value = self.get(b).value;
         let result = self.push(a_value * b_value);
 
         self.join(Op::Multiply, result, (Some(a), Some(b)));
@@ -100,9 +111,12 @@ impl ValueDb {
         return result;
     }
 
-    pub fn zero_grad(&mut self) {
-        for value in self.values.iter_mut() {
-            value.grad = 0.0;
-        }
+    pub fn op_tanh(&mut self, a: ID) -> ID {
+        let a_value = self.get(a).value;
+        let result = self.push(a_value.tanh());
+        
+        self.join(Op::Tanh, result, (Some(a), None));
+
+        return result;
     }
 }

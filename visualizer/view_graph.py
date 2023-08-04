@@ -8,6 +8,7 @@ class Op(Enum):
     NONE = '0'
     ADD = '1'
     MUL = '2'
+    TANH = '3'
 
 
 @dataclass
@@ -42,9 +43,12 @@ def create_graph(model: List[Value]) -> Digraph:
         if value.op == Op.ADD.value:
             op_node = f'+{i}'
             dot.node(op_node, label='+')
-        if value.op == Op.MUL.value:
+        elif value.op == Op.MUL.value:
             op_node = f'*{i}'
             dot.node(op_node, label='*')
+        elif value.op == Op.TANH.value:
+            op_node = f't{i}'
+            dot.node(op_node, label='tanh')
 
         if op_node:
             dot.edge(op_node, str(i))

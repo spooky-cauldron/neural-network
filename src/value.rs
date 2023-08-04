@@ -49,4 +49,5 @@ pub enum Op {
     None,
     Add,
     Multiply,
+    Tanh,
 }
