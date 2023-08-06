@@ -18,7 +18,7 @@ impl Neuron {
         return Neuron { weights, bias };
     }
 
-    pub fn input(&self, input_ids: &[ID], db: &mut ValueDb) -> ID {
+    pub fn forward(&self, input_ids: &[ID], db: &mut ValueDb) -> ID {
         let weighted: Vec<ID> = input_ids.into_iter()
             .zip(self.weights.iter())
             .map(|(input_id, weight_id)| db.op_mul(*input_id, *weight_id))
