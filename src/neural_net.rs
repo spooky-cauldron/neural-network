@@ -27,11 +27,13 @@ impl NeuralNetwork {
         self.layers.push(layer);
     }
 
-    pub fn forward(&mut self, input_data_ids: Vec<ID>) {
-        let mut input_layer = input_data_ids;
+    pub fn forward(&mut self, input_data_ids: Vec<ID>) -> Vec<f32> {
+        let mut active_layer = input_data_ids;
         for i in 0..self.layers.len() {
-            input_layer = self.layers[i].forward(&input_layer, &mut self.value_db);
+            active_layer = self.layers[i].forward(&active_layer, &mut self.value_db);
         }
+
+        return active_layer.iter().map(|id| self.value_db.get(*id).value).collect();
     }
 
     pub fn add_values(&mut self, inputs: &[f32]) -> Vec<ID> {
