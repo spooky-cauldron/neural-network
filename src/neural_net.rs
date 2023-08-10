@@ -40,6 +40,24 @@ impl NeuralNetwork {
         self.value_db.backward(from);
     }
 
+    pub fn zero_grad(&mut self) {
+        self.value_db.zero_grad();
+    }
+
+    pub fn parameters(&self) -> Vec<ID> {
+        self.layers.iter()
+            .map(|layer| layer.parameters())
+            .collect::<Vec<Vec<ID>>>()
+            .concat()
+    }
+
+    pub fn optimize(&mut self, rate: f32) {
+        for param_id in self.parameters() {
+            let param = self.value_db.get_mut(param_id);
+            param.value += param.grad * rate * -1.0;
+        }
+    }
+
     pub fn add_values(&mut self, inputs: &[f32]) -> Vec<ID> {
         let added_value_ids = inputs.iter()
             .map(|input| self.value_db.push(input.clone()))
@@ -87,5 +105,12 @@ impl Layer {
             .map(|neuron| neuron.forward(input_ids, db))
             .collect();
         return outputs;
+    }
+
+    pub fn parameters(&self) -> Vec<ID> {
+        self.neurons.iter()
+            .map(|neuron| neuron.parameters())
+            .collect::<Vec<Vec<ID>>>()
+            .concat()
     }
 }

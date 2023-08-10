@@ -24,9 +24,14 @@ fn main() {
     let loss_id = nn.loss(predictions, label_ids);
     let loss = nn.get_value(loss_id).value; 
     println!("Loss: {}", loss);
+    println!("Network Parameter Count: {}", nn.parameters().len());
 
+    nn.zero_grad();
     nn.backward(loss_id);
+
+    let learing_rate = 0.1;
+    nn.optimize(learing_rate);
         
-    nn.save("./saves/model_0.txt");
+    // nn.save("./saves/model_0.txt");
 }
 

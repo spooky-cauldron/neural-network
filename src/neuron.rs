@@ -30,6 +30,12 @@ impl Neuron {
         let output = db.op_tanh(activation);
         return output;
     }
+
+    pub fn parameters(&self) -> Vec<ID> {
+        let mut params = self.weights.clone();
+        params.push(self.bias);
+        return params;
+    }
 }
 
 fn random_between(min: f32, max: f32) -> f32 {
