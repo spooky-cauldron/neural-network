@@ -1,6 +1,7 @@
 use crate::neuron::Neuron;
 use crate::value_db::ValueDb;
 use crate::ID;
+use crate::value::Value;
 
 pub struct NeuralNetwork {
     value_db: ValueDb,
@@ -27,13 +28,16 @@ impl NeuralNetwork {
         self.layers.push(layer);
     }
 
-    pub fn forward(&mut self, input_data_ids: Vec<ID>) -> Vec<f32> {
+    pub fn forward(&mut self, input_data_ids: Vec<ID>) -> Vec<ID> {
         let mut active_layer = input_data_ids;
         for i in 0..self.layers.len() {
             active_layer = self.layers[i].forward(&active_layer, &mut self.value_db);
         }
+        return active_layer;
+    }
 
-        return active_layer.iter().map(|id| self.value_db.get(*id).value).collect();
+    pub fn backward(&mut self, from: ID) {
+        self.value_db.backward(from);
     }
 
     pub fn add_values(&mut self, inputs: &[f32]) -> Vec<ID> {
@@ -41,6 +45,23 @@ impl NeuralNetwork {
             .map(|input| self.value_db.push(input.clone()))
             .collect();
         return added_value_ids;
+    }
+
+    pub fn get_value(&mut self, id: ID) -> &Value {
+        self.value_db.get(id)
+    }
+
+    pub fn loss(&mut self, prediction_ids: Vec<ID>, label_ids: Vec<ID>) -> ID {
+        let mut losses = vec![];
+        for (prediction_id, label_id) in prediction_ids.iter().zip(label_ids) {
+            let negate = self.value_db.push(-1.0);
+            let negative_prediction = self.value_db.op_mul(*prediction_id, negate);
+            let diff = self.value_db.op_add(label_id, negative_prediction);
+            let diff_squared = self.value_db.op_mul(diff, diff);
+            losses.push(diff_squared);
+        }
+        let total_loss_id = losses.into_iter().reduce(|acc, e| self.value_db.op_add(acc, e));
+        return total_loss_id.unwrap();
     }
 
     pub fn save(&self, path: &str) {
