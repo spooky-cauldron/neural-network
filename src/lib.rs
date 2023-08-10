@@ -1,4 +1,4 @@
-mod value;
+pub mod value;
 pub mod value_db;
 mod neuron;
 pub mod neural_net;

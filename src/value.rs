@@ -1,6 +1,6 @@
 use crate::ID;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Value {
     pub value: f32,
     pub grad: f32,
