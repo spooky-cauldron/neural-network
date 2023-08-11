@@ -85,6 +85,17 @@ impl ValueDb {
         }
     }
 
+    pub fn clear(&mut self, from_id: ID) {
+        if from_id >= self.values.len() {
+            return;
+        }
+        self.values.drain(from_id..);
+    }
+
+    pub fn len(&self) -> usize {
+        self.values.len()
+    }
+
     pub fn save(&self, path: &str) {
         let data: Vec<String> = self.values.iter()
             .map(|value| value.to_save())

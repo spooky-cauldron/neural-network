@@ -14,9 +14,10 @@ fn main() {
     let mut nn = NeuralNetwork::new(&network_shape);
     println!("Network Parameter Count: {}", nn.parameters().len());
 
-    let n_epochs = 1000;
+    let n_epochs = 10000;
 
     for i in 0..n_epochs {
+        nn.reset();
         let mut predictions = vec![];
         for input in dataset {
             let input_layer = nn.add_values(&input);

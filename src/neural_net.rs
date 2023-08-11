@@ -6,11 +6,12 @@ use crate::value::Value;
 pub struct NeuralNetwork {
     value_db: ValueDb,
     layers: Vec<Layer>,
+    pub core_value_count: usize,
 }
 
 impl NeuralNetwork {
     pub fn new_empty() -> Self {
-        NeuralNetwork { value_db: ValueDb::new(), layers: vec![] }
+        NeuralNetwork { value_db: ValueDb::new(), layers: vec![], core_value_count: 0 }
     }
 
     pub fn new(layer_sizes: &[u64]) -> Self {
@@ -20,6 +21,7 @@ impl NeuralNetwork {
             let n_outputs = layer_sizes[i];
             nn.add_layer(n_inputs, n_outputs)
         }
+        nn.core_value_count = nn.value_db.len();
         return nn;
     }
 
@@ -34,6 +36,13 @@ impl NeuralNetwork {
             active_layer = self.layers[i].forward(&active_layer, &mut self.value_db);
         }
         return active_layer;
+    }
+
+    pub fn reset(&mut self) {
+        if self.core_value_count == 0 {
+            return;
+        }
+        self.value_db.clear(self.core_value_count + 1);
     }
 
     pub fn backward(&mut self, from: ID) {
