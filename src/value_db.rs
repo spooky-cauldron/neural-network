@@ -41,12 +41,11 @@ impl ValueDb {
         let mut child_gradients_to_calculate = VecDeque::new();
         child_gradients_to_calculate.push_back(from);
 
-        let mut count = 0;
+        let mut max_len = 0;
         while child_gradients_to_calculate.len() > 0 {
-            // if count < 10 {
-            //     println!("{:?}", child_gradients_to_calculate);
-            // }
-            count += 1;
+            if child_gradients_to_calculate.len() > max_len {
+                max_len = child_gradients_to_calculate.len();
+            }
             let value_id = child_gradients_to_calculate[0];
             self.calculate_child_gradients(value_id);
             let mut additional_gradients_to_calculate = self.get(value_id).children();

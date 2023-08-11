@@ -1,15 +1,7 @@
 use neural_network::neural_net::NeuralNetwork;
-use neural_network::value::Value;
 
 
 fn main() {
-    // let child_0_value: f32 = 0.056383014;
-    // let parent_grad = -7.549413;
-    // let grad = (1.0 - child_0_value.tanh().powi(2)) * parent_grad;
-    // dbg!(grad);
-    // return;
-
-
     let dataset = [
         [2.0, -3.0, 2.0],
         [3.0, -1.0, 0.5],
@@ -22,7 +14,7 @@ fn main() {
     let mut nn = NeuralNetwork::new(&network_shape);
     println!("Network Parameter Count: {}", nn.parameters().len());
 
-    let n_epochs = 10000;
+    let n_epochs = 1000;
 
     for i in 0..n_epochs {
         let mut predictions = vec![];
