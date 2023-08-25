@@ -12,14 +12,8 @@ fn test_value_db_value_insert() {
     let d = db.push(4.0);
     let e = db.op_mul(c, d);
 
-
-    let expected_values: HashMap<ID, f32> = HashMap::from([
-        (a, 1.0),
-        (b, 2.0),
-        (c, 3.0),
-        (d, 4.0),
-        (e, 12.0),
-    ]);
+    let expected_values: HashMap<ID, f32> =
+        HashMap::from([(a, 1.0), (b, 2.0), (c, 3.0), (d, 4.0), (e, 12.0)]);
 
     for (value_id, expected_value) in expected_values {
         assert_eq!(db.get(value_id).value, expected_value);
@@ -37,7 +31,6 @@ fn test_value_db_value_insert_2() {
     let d = db.op_add(e, c);
     let f = db.push(-2.0);
     let g = db.op_mul(d, f);
-
 
     let expected_values: HashMap<ID, f32> = HashMap::from([
         (a, 2.0),
@@ -69,7 +62,6 @@ fn test_value_db_value_insert_tanh() {
     let x1w1x2w2 = db.op_add(x1w1, x2w2);
     let n = db.op_add(x1w1x2w2, b);
     let o = db.op_tanh(n);
-
 
     let expected_values: HashMap<ID, f32> = HashMap::from([
         (x1, 2.0),
@@ -103,13 +95,8 @@ fn test_value_db_backpropagation() {
     db.zero_grad();
     db.backward(e);
 
-    let expected_gradients: HashMap<ID, f32> = HashMap::from([
-        (a, 4.0),
-        (b, 4.0),
-        (c, 4.0),
-        (d, 3.0),
-        (e, 1.0),
-    ]);
+    let expected_gradients: HashMap<ID, f32> =
+        HashMap::from([(a, 4.0), (b, 4.0), (c, 4.0), (d, 3.0), (e, 1.0)]);
 
     for (value_id, expected_gradient) in expected_gradients {
         assert_eq!(db.get(value_id).grad, expected_gradient);
@@ -194,14 +181,15 @@ fn test_value_db_backpropagation_gradient_accumulation() {
     db.zero_grad();
     db.backward(b);
 
-    let expected_gradients: HashMap<ID, f32> = HashMap::from([
-        (a, 2.0),
-        (b, 1.0),
-    ]);
+    let expected_gradients: HashMap<ID, f32> = HashMap::from([(a, 2.0), (b, 1.0)]);
 
     for (value_id, expected_gradient) in expected_gradients {
         let delta = (db.get(value_id).grad - expected_gradient).abs();
-        println!("expected: {}, actual: {}", expected_gradient, db.get(value_id).grad);
+        println!(
+            "expected: {}, actual: {}",
+            expected_gradient,
+            db.get(value_id).grad
+        );
         assert!(delta < 0.001);
     }
 }
@@ -219,17 +207,16 @@ fn test_value_db_backpropagation_gradient_accumulation_2() {
     db.zero_grad();
     db.backward(f);
 
-    let expected_gradients: HashMap<ID, f32> = HashMap::from([
-        (a, -3.0),
-        (b, -8.0),
-        (d, 1.0),
-        (e, -6.0),
-        (f, 1.0),
-    ]);
+    let expected_gradients: HashMap<ID, f32> =
+        HashMap::from([(a, -3.0), (b, -8.0), (d, 1.0), (e, -6.0), (f, 1.0)]);
 
     for (value_id, expected_gradient) in expected_gradients {
         let delta = (db.get(value_id).grad - expected_gradient).abs();
-        println!("expected: {}, actual: {}", expected_gradient, db.get(value_id).grad);
+        println!(
+            "expected: {}, actual: {}",
+            expected_gradient,
+            db.get(value_id).grad
+        );
         assert!(delta < 0.001);
     }
 }
@@ -252,13 +239,8 @@ fn test_value_db_zero_grad() {
 
     db.backward(e);
 
-    let expected_gradients: HashMap<ID, f32> = HashMap::from([
-        (a, 4.0),
-        (b, 4.0),
-        (c, 4.0),
-        (d, 3.0),
-        (e, 1.0),
-    ]);
+    let expected_gradients: HashMap<ID, f32> =
+        HashMap::from([(a, 4.0), (b, 4.0), (c, 4.0), (d, 3.0), (e, 1.0)]);
 
     for (value_id, expected_gradient) in expected_gradients {
         assert_eq!(db.get(value_id).grad, expected_gradient);

@@ -1,6 +1,5 @@
 use neural_network::neural_net::NeuralNetwork;
 
-
 fn main() {
     let dataset = [
         [2.0, -3.0, 2.0],
@@ -9,7 +8,7 @@ fn main() {
         [1.0, -1.0, 1.0],
     ];
     let labels = [1.0, -1.0, -1.0, 1.0];
-    
+
     let network_shape = [3, 4, 4, 1];
     let mut nn = NeuralNetwork::new(&network_shape);
     println!("Network Parameter Count: {}", nn.parameters().len());
@@ -25,13 +24,13 @@ fn main() {
             predictions.push(prediction[0]);
         }
         let label_ids = nn.add_values(&labels);
-        
+
         let loss_id = nn.loss(predictions, label_ids);
-        let loss = nn.get_value(loss_id).value; 
+        let loss = nn.get_value(loss_id).value;
         if i % 100 == 0 {
             println!("Loss: {}", loss);
         }
-        
+
         nn.zero_grad();
         nn.backward(loss_id);
 
@@ -47,10 +46,11 @@ fn main() {
         predictions.push(prediction[0]);
     }
     dbg!(&predictions);
-    let results: Vec<f32> = predictions.into_iter().map(|id| nn.get_value(id).value).collect();
+    let results: Vec<f32> = predictions
+        .into_iter()
+        .map(|id| nn.get_value(id).value)
+        .collect();
     dbg!(results);
-        
+
     // nn.save("./saves/model_0.txt");
 }
-
-

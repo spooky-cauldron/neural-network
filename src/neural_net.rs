@@ -1,7 +1,7 @@
 use crate::neuron::Neuron;
+use crate::value::Value;
 use crate::value_db::ValueDb;
 use crate::ID;
-use crate::value::Value;
 
 pub struct NeuralNetwork {
     value_db: ValueDb,
@@ -11,7 +11,11 @@ pub struct NeuralNetwork {
 
 impl NeuralNetwork {
     pub fn new_empty() -> Self {
-        NeuralNetwork { value_db: ValueDb::new(), layers: vec![], core_value_count: 0 }
+        NeuralNetwork {
+            value_db: ValueDb::new(),
+            layers: vec![],
+            core_value_count: 0,
+        }
     }
 
     pub fn new(layer_sizes: &[u64]) -> Self {
@@ -54,7 +58,8 @@ impl NeuralNetwork {
     }
 
     pub fn parameters(&self) -> Vec<ID> {
-        self.layers.iter()
+        self.layers
+            .iter()
             .map(|layer| layer.parameters())
             .collect::<Vec<Vec<ID>>>()
             .concat()
@@ -68,7 +73,8 @@ impl NeuralNetwork {
     }
 
     pub fn add_values(&mut self, inputs: &[f32]) -> Vec<ID> {
-        let added_value_ids = inputs.iter()
+        let added_value_ids = inputs
+            .iter()
             .map(|input| self.value_db.push(input.clone()))
             .collect();
         return added_value_ids;
@@ -87,7 +93,9 @@ impl NeuralNetwork {
             let diff_squared = self.value_db.op_mul(diff, diff);
             losses.push(diff_squared);
         }
-        let total_loss_id = losses.into_iter().reduce(|acc, e| self.value_db.op_add(acc, e));
+        let total_loss_id = losses
+            .into_iter()
+            .reduce(|acc, e| self.value_db.op_add(acc, e));
         return total_loss_id.unwrap();
     }
 
@@ -97,11 +105,11 @@ impl NeuralNetwork {
 }
 
 pub struct Layer {
-    neurons: Vec<Neuron>
+    neurons: Vec<Neuron>,
 }
 
 impl Layer {
-    pub fn new(n_inputs: u64, n_outputs: u64, db: &mut ValueDb)  -> Self {
+    pub fn new(n_inputs: u64, n_outputs: u64, db: &mut ValueDb) -> Self {
         let mut neurons = vec![];
         for _ in 0..n_outputs {
             neurons.push(Neuron::new(n_inputs, db));
@@ -110,14 +118,17 @@ impl Layer {
     }
 
     pub fn forward(&self, input_ids: &[ID], db: &mut ValueDb) -> Vec<ID> {
-        let outputs = self.neurons.iter()
+        let outputs = self
+            .neurons
+            .iter()
             .map(|neuron| neuron.forward(input_ids, db))
             .collect();
         return outputs;
     }
 
     pub fn parameters(&self) -> Vec<ID> {
-        self.neurons.iter()
+        self.neurons
+            .iter()
             .map(|neuron| neuron.parameters())
             .collect::<Vec<Vec<ID>>>()
             .concat()

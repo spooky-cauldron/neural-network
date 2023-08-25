@@ -1,5 +1,5 @@
-use crate::ID;
 use crate::value_db::ValueDb;
+use crate::ID;
 use rand::prelude::*;
 
 pub struct Neuron {
@@ -19,11 +19,13 @@ impl Neuron {
     }
 
     pub fn forward(&self, input_ids: &[ID], db: &mut ValueDb) -> ID {
-        let weighted: Vec<ID> = input_ids.into_iter()
+        let weighted: Vec<ID> = input_ids
+            .into_iter()
             .zip(self.weights.iter())
             .map(|(input_id, weight_id)| db.op_mul(*input_id, *weight_id))
             .collect();
-        let weighted_sum = weighted.into_iter()
+        let weighted_sum = weighted
+            .into_iter()
             .reduce(|acc, e| db.op_add(acc, e))
             .unwrap();
         let activation = db.op_add(weighted_sum, self.bias);

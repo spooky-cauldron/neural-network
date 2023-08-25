@@ -1,15 +1,16 @@
-use std::fs;
-use std::collections::VecDeque;
 use crate::value::*;
 use crate::ID;
+use std::collections::VecDeque;
+use std::fs;
 
 pub struct ValueDb {
     values: Vec<Value>,
 }
 
-
 impl ValueDb {
-    pub fn new() -> Self { ValueDb { values: vec![] } }
+    pub fn new() -> Self {
+        ValueDb { values: vec![] }
+    }
 
     pub fn push(&mut self, value: f32) -> ID {
         self.values.push(Value::new(value));
@@ -49,7 +50,9 @@ impl ValueDb {
             let value_id = child_gradients_to_calculate[0];
             self.calculate_child_gradients(value_id);
             let mut additional_gradients_to_calculate = self.get(value_id).children();
-            if additional_gradients_to_calculate.len() == 2 && additional_gradients_to_calculate[0] == additional_gradients_to_calculate[1] {
+            if additional_gradients_to_calculate.len() == 2
+                && additional_gradients_to_calculate[0] == additional_gradients_to_calculate[1]
+            {
                 additional_gradients_to_calculate.pop();
             }
             child_gradients_to_calculate.extend(additional_gradients_to_calculate.iter());
@@ -78,10 +81,11 @@ impl ValueDb {
 
             Op::Tanh => {
                 let child_0_value = self.get(children[0]).value;
-                self.get_mut(children[0]).grad += (1.0 - child_0_value.tanh().powi(2)) * parent_grad;
+                self.get_mut(children[0]).grad +=
+                    (1.0 - child_0_value.tanh().powi(2)) * parent_grad;
             }
 
-            _ => ()
+            _ => (),
         }
     }
 
@@ -97,9 +101,7 @@ impl ValueDb {
     }
 
     pub fn save(&self, path: &str) {
-        let data: Vec<String> = self.values.iter()
-            .map(|value| value.to_save())
-            .collect();
+        let data: Vec<String> = self.values.iter().map(|value| value.to_save()).collect();
         let data_output = data.join(",");
         match fs::write(path, data_output) {
             Ok(_) => println!("Saved model to path: {}", path),
@@ -132,7 +134,7 @@ impl ValueDb {
     pub fn op_tanh(&mut self, a: ID) -> ID {
         let a_value = self.get(a).value;
         let result = self.push(a_value.tanh());
-        
+
         self.join(Op::Tanh, result, (Some(a), None));
 
         return result;
